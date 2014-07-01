@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+    <form method="post" action="signin">
+        <input type="email" name="email" placeholder="email"><br>
+        <input type="password" name="password" placeholder="password"><br>
+        <input type="submit" value="sign in">
+
+        <% if (success) { %>
+            <div><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div><%= error %> </div>
+        <% } %>
+    </form>
+
+</body>
+</html>

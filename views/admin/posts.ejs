@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+
+<% posts.forEach(function (post, index) { %>
+    <p><h2><a href="#"><%= post.title %></a></h2></p>
+    <p class="info">
+        作者：<a href="#"><%= post.author_id %></a> |
+        日期：<%= post.published_at %>
+    </p>
+    <p><%- post.html %></p>
+<% }) %>
+
+</body>
+</html>

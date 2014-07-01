@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/editor.css' />
+</head>
+<body>
+
+
+    <div class="navbar">
+        <ul class="main-menu">
+            <li>CONTENT</li>
+            <li>NEW POST</li>
+            <li>SETTINGS</li>
+        </ul>
+    </div>
+
+
+    <form method="post" action="editor">
+        <input type="text" name="title" placeholder="title"><br>
+
+        <textarea rows="10" cols="100" name="content"></textarea><br>
+
+        <input type="submit" value="sign in">
+
+        <% if (success) { %>
+            <div><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div><%= error %> </div>
+        <% } %>
+    </form>
+
+</body>
+</html>
