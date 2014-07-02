@@ -7,12 +7,11 @@
 <body>
 
 <% posts.forEach(function (post, index) { %>
-    <p><h2><a href="#"><%= post.title %></a></h2></p>
+    <p><h2><a href="/admin/editor/<%= post._id %>"><%= post.title %></a></h2></p>
     <p class="info">
-        作者：<a href="#"><%= post.author_id %></a> |
         日期：<%= post.published_at %>
     </p>
-    <p><%- post.html %></p>
+    <p><%- post.content %></p>
 <% }) %>
 
 </body>

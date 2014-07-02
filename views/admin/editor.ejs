@@ -16,12 +16,17 @@
     </div>
 
 
-    <form method="post" action="editor">
-        <input type="text" name="title" placeholder="title"><br>
+    <form method="post">
+        <input type="hidden" name="_id" value="<% if (post._id) { %> <%= post._id %> <% } %>">
+        <input type="text" name="title" placeholder="title" value="<% if (post.title) { %> <%= post.title %> <% } %>"><br>
 
-        <textarea rows="10" cols="100" name="content"></textarea><br>
+        <input type="text" name="slug" placeholder="static url" value="<% if (post.slug) { %> <%= post.slug %> <% } %>"><br>
 
-        <input type="submit" value="sign in">
+        <textarea rows="10" cols="100" name="content">
+            <% if (post.markdown) { %> <%= post.markdown %> <% } %>
+        </textarea><br>
+
+        <input type="submit" value="publish now">
 
         <% if (success) { %>
             <div><%= success %></div>

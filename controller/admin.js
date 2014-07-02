@@ -1,10 +1,10 @@
 var crypto = require('crypto');
 var markdown = require('markdown').markdown;
+var when = require('when');
 var User = require('../models/user');
 var Post = require('../models/post');
 var adminCtrl = {
     index : function(req, res){
-        console.log('session user: ', req.session.user);
         if(req.session.user === undefined || req.session.user === null){
             return res.redirect('/admin/signin');
         }else{
@@ -58,12 +58,9 @@ var adminCtrl = {
             email = req.body.email,
             password = req.body.password;
 
-        console.log(name, '\n', email, '\n', password)
-
         var md5 = crypto.createHash('md5');
         password = md5.update(password).digest('hex');
 
-        console.log('password hex: ', password);
 
         var _user = new User({
             name : name,
@@ -73,16 +70,13 @@ var adminCtrl = {
 
         User.get(email, function(err, user){
             if(err){
-                console.log('unknown error');
             }
             if(user){
-                console.log( email, 'is exist');
                 req.flash('error', email + 'is exist');
                 return res.redirect('signup');
             }
             _user.save(function(err, user){
                 if(err){
-                    console.log( email, 'unknown error');
                     req.flash('error', 'unknown error');
                     return res.redirect('signup');
                 }
@@ -96,6 +90,7 @@ var adminCtrl = {
     content : function(req, res){
 
         Post.findAll(function(err, postlist){
+
             res.render('admin/posts',{
                 title : "Content list",
                 posts : postlist
@@ -104,6 +99,17 @@ var adminCtrl = {
 
     },
 
+    toUpdatePost : function (req, res) {
+        var id = req.params.post_id;
+        Post.getById(id, function (err, post) {
+            return res.render('admin/editor', {
+                title: 'editor',
+                post : post,
+                success : req.flash('success').toString(),
+                error : req.flash('error').toString()
+            })
+        })
+    },
 
     toCreate : function(req, res){
         res.render('admin/editor', {
@@ -114,30 +120,57 @@ var adminCtrl = {
     },
     createPost : function(req, res){
         var title = req.body.title,
-            content = req.body.content;
+            content = req.body.content,
+            slug = req.body.slug;
 
         var user = req.session.user;
 
         var _post = new Post({
-            title : title,
-            markdown : content,
-            html : markdown.toHTML(content),
-            published_by : user._id,
-            create_by : user._id,
-            author_id : user._id
+            title: title,
+            markdown: content,
+            html: markdown.toHTML(content),
+            published_by: user._id,
+            create_by: user._id,
+            author_id: user._id,
 
-//            slug : ''//url
-//            status : 'published'
+            slug : slug,
+            status : 'published'
 
         });
 
-        _post.save(function(err, post){
-            if(err){
+        _post.save(function (err, post) {
+            if (err) {
                 req.flash('error', 'unknown error!');
                 return res.redirect('editor');
             }
             req.flash('success', 'save success');
             return res.redirect('editor');
+        });
+    },
+
+    doUpdatePost : function(req, res){
+        var title = req.body.title,
+            content = req.body.content,
+            slug = req.body.slug;
+
+        var id = req.params.post_id;
+        Post.getById(id, function(err, post){
+            post.title = title;
+            post.markdown = content;
+            post.html = markdown.toHTML(content);
+            post.updated_at = new Date();
+            post.updated_by = req.session.user._id;
+            post.slug = slug;
+
+            post.save(function(err, p){
+                req.flash('post', p);
+                if (err) {
+                    req.flash('error', 'unknown error!');
+                    return res.redirect('editor');
+                }
+                req.flash('success', 'save success');
+                return res.redirect('editor');
+            });
         });
     }
 

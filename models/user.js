@@ -1,5 +1,5 @@
 var mongodb = require('./base');
-
+var ObjectId = require('mongodb').ObjectID;
 var user_table_name = 'users';
 
 function User(user) {
@@ -48,19 +48,19 @@ User.prototype.save = function(callback){
         updated_by : this.updated_by
     };
 
-    mongodb.open(function (err, db) {
+    mongodb.acquire(function (err, db) {
         if (err) {
             return callback(err);
         }
         db.collection(user_table_name, function(err, collection) {
             if (err) {
-                mongodb.close();
+                mongodb.release(db);
                 return callback(err);
             }
             collection.insert(user, {
                 safe : true
             }, function(err, user) {
-                mongodb.close();
+                mongodb.release(db);
                 if (err) {
                     return callback(err);
                 }
@@ -72,19 +72,42 @@ User.prototype.save = function(callback){
 };
 
 User.get = function(email, callback){
-    mongodb.open(function(err, db) {
+    mongodb.acquire(function(err, db) {
         if (err) {
             return callback(err);
         }
         db.collection(user_table_name, function(err, collection) {
             if (err) {
-                mongodb.close();
+                mongodb.release(db);
                 return callback(err);
             }
             collection.findOne({
                 email : email
             }, function(err, user) {
-                mongodb.close();
+                mongodb.release(db);
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, user);// success, return user info
+            });
+        });
+    });
+};
+
+User.getById = function(id, callback){
+    mongodb.acquire(function(err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection(user_table_name, function(err, collection) {
+            if (err) {
+                mongodb.release(db);
+                return callback(err);
+            }
+            collection.findOne({
+                _id : new ObjectId(id)
+            }, function(err, user) {
+                mongodb.release(db);
                 if (err) {
                     return callback(err);
                 }

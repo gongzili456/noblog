@@ -21,4 +21,7 @@ module.exports = function (app) {
 
     app.get('/admin/editor', admin.toCreate);
     app.post('/admin/editor', admin.createPost);
+
+    app.get('/admin/editor/:post_id', admin.toUpdatePost);
+    app.post('/admin/editor/:post_id', admin.doUpdatePost);
 }

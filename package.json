@@ -17,6 +17,8 @@
     "connect-flash" : "*",
     "connect-mongo" : "*",
     "express-session" : "*",
-    "markdown" : "*"
+    "markdown" : "*",
+    "generic-pool" : "*",
+    "when" : "*"
   }
 }
