@@ -1,5 +1,9 @@
 var mongodb = require('./base');
+var config = require('../config');
+var database = config.database.connection.database;
 var ObjectId = require('mongodb').ObjectID;
+var DBRef = require('mongodb').DBRef;
+var User = require('./user.js');
 var post_table_name = 'posts';
 
 function Post(post) {
@@ -40,11 +44,11 @@ Post.prototype.save = function(callback){
         meta_description : this.meta_description,
         author_id : this.author_id,
         create_at : new Date(),
-        create_by : this.create_by,
+        create_by : this.author_id,
         updated_at : new Date(),
-        updated_by : this.updated_by,
+        updated_by : this.author_id,
         published_at : new Date(),
-        published_by : this.published_by
+        published_by : this.author_id
     };
     mongodb.acquire(function (err, db) {
         if (err) {
@@ -80,11 +84,12 @@ Post.getByAuthorId = function(id, callback){
             }
             collection.find({
                 author_id : id
-            }).toArray(function (err, posts) {
+            }).sort({published_by : -1}).toArray(function (err, posts) {
                 mongodb.release(db);
                 if(err){
                     return callback(err);
                 }
+
                 callback(null, posts);
             });
         });
@@ -103,6 +108,29 @@ Post.getById = function(id, callback){
             }
             collection.findOne({
                 _id : new ObjectId(id)
+            }, function(err, p) {
+                mongodb.release(db);
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, p);// success, return post info
+            });
+        });
+    });
+};
+
+Post.getBySlug = function(slug, callback){
+    mongodb.acquire(function(err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection(post_table_name, function(err, collection) {
+            if (err) {
+                mongodb.release(db);
+                return callback(err);
+            }
+            collection.findOne({
+                slug : slug
             }, function(err, p) {
                 mongodb.release(db);
                 if (err) {
@@ -135,5 +163,47 @@ Post.findAll = function(callback){
         });
     });
 };
+
+Post.findAllAndUser = function(callback){
+    mongodb.acquire(function(err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection(post_table_name, function(err, collection) {
+            if (err) {
+                mongodb.release(db);
+                return callback(err);
+            }
+            var query = {};
+            collection.find(query).sort({published_by : -1}).toArray(function (err, posts) {
+                if(err){
+                    mongodb.release(db);
+                    return callback(err);
+                }
+                callback(null, posts);
+            });
+        });
+    });
+};
+
+Post.updateById = function(id, post, callback){
+    mongodb.acquire(function(err, db){
+        if(err){
+            return callback(err);
+        }
+        db.collection(post_table_name, function(err, collection){
+            if(err){
+                mongodb.release(db);
+                return callback(err);
+            }
+            collection.update({
+                _id : new ObjectId(id)
+            }, {$set: post}, function(err, p){
+                if(err){return callback(err)}
+                return callback(null, p);
+            });
+        });
+    });
+}
 
 module.exports = Post;

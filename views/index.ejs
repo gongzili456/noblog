@@ -7,5 +7,15 @@
   <body>
     <h1><%= title %></h1>
     <p>Welcome to <%= title %></p>
+
+
+    <% posts.forEach(function (post, index) { %>
+    <p><h2><a href="<%= post.url %>"><%= post.title %></a></h2></p>
+    <p class="info">
+        作者：<%= post.author.name %>
+        日期：<%= post.published_at %>
+    </p>
+    <p><%- post.content %></p>
+    <% }) %>
   </body>
 </html>

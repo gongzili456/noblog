@@ -5,12 +5,14 @@ body {
     background: #edece4;
 }
 
-.navbar{
-    background-color: burlywood;
+.editor {
+    width: 70%;
 }
-.main-menu{
 
+input {
+    width: 50%;
 }
-.main-menu li{
 
+textarea {
+    width: 50%;
 }

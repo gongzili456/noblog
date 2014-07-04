@@ -117,4 +117,29 @@ User.getById = function(id, callback){
     });
 };
 
+User.getByIds = function(ids, callback){
+    mongodb.acquire(function(err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection(user_table_name, function(err, collection) {
+            if (err) {
+                mongodb.release(db);
+                return callback(err);
+            }
+            collection.find({
+                _id : {$in: ids}
+            }).toArray( function(err, user) {
+                mongodb.release(db);
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, user);// success, return user info
+            });
+        });
+    });
+};
+
+
 module.exports = User;
+module.exports.user_table_name = user_table_name;

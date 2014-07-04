@@ -89,11 +89,16 @@ var adminCtrl = {
     },
     content : function(req, res){
 
-        Post.findAll(function(err, postlist){
+        //后台显示某作者的所有文章
+        //session中有用户信息
+        //根据user id 查询帖子信息，根据时间排序
 
+        var id = req.session.user._id;
+        Post.getByAuthorId(id, function(err, postlist){
             res.render('admin/posts',{
                 title : "Content list",
-                posts : postlist
+                posts : postlist,
+                author : req.session.user
             });
         });
 
@@ -114,66 +119,61 @@ var adminCtrl = {
     toCreate : function(req, res){
         res.render('admin/editor', {
             title: 'editor',
+            post : new Post({}),
             success : req.flash('success').toString(),
             error : req.flash('error').toString()
         });
     },
     createPost : function(req, res){
-        var title = req.body.title,
-            content = req.body.content,
-            slug = req.body.slug;
+        var _iid = req.body._id;
+        if(typeof _iid === 'undefined' || _iid === null || _iid === ''){
+            var title = req.body.title,
+                content = req.body.content,
+                slug = req.body.slug;
+            var user = req.session.user;
+            var _post = new Post({
+                title: title,
+                markdown: content,
+                html: markdown.toHTML(content),
+                published_by: user._id,
+                create_by: user._id,
+                author_id: user._id,
+                slug : slug,
+                status : 'published'
 
-        var user = req.session.user;
-
-        var _post = new Post({
-            title: title,
-            markdown: content,
-            html: markdown.toHTML(content),
-            published_by: user._id,
-            create_by: user._id,
-            author_id: user._id,
-
-            slug : slug,
-            status : 'published'
-
-        });
-
-        _post.save(function (err, post) {
-            if (err) {
-                req.flash('error', 'unknown error!');
-                return res.redirect('editor');
-            }
-            req.flash('success', 'save success');
-            return res.redirect('editor');
-        });
-    },
-
-    doUpdatePost : function(req, res){
-        var title = req.body.title,
-            content = req.body.content,
-            slug = req.body.slug;
-
-        var id = req.params.post_id;
-        Post.getById(id, function(err, post){
-            post.title = title;
-            post.markdown = content;
-            post.html = markdown.toHTML(content);
-            post.updated_at = new Date();
-            post.updated_by = req.session.user._id;
-            post.slug = slug;
-
-            post.save(function(err, p){
+            });
+            _post.save(function (err, post) {
+                if (err) {
+                    req.flash('error', 'unknown error!');
+                    return res.redirect('/admin');
+                }
+                req.flash('success', 'save success');
+                return res.redirect('/admin');
+            });
+        } else {
+            var title = req.body.title,
+                content = req.body.content,
+                slug = req.body.slug;
+            var id = req.body._id.trim();
+            var post = {
+                title : title,
+                markdown : content,
+                html : markdown.toHTML(content),
+                updated_at : new Date(),
+                updated_by : req.session.user._id,
+                slug : slug
+            };
+            Post.updateById(id, post, function(err, p){
                 req.flash('post', p);
                 if (err) {
                     req.flash('error', 'unknown error!');
-                    return res.redirect('editor');
+                    return res.redirect('/admin');
                 }
                 req.flash('success', 'save success');
-                return res.redirect('editor');
+                return res.redirect('/admin');
             });
-        });
+        }
     }
-
 
 };
 

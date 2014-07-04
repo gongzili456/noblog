@@ -36,6 +36,7 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 router.admin(app);
+router.frontend(app);
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
