@@ -3,4 +3,4 @@
 
 ####效果图
 
-![预览图](https://github.com/gongzili456/noblog/blob/master/screnn.png)
+![](https://raw.githubusercontent.com/gongzili456/noblog/master/screnn.png)
