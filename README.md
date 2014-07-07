@@ -8,6 +8,8 @@
 
 ####使用
 
+首先你需要安装好mongodb
+
 克隆项目
 `git clone https://github.com/gongzili456/noblog.git`
 
