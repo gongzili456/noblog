@@ -142,6 +142,29 @@ Post.getBySlug = function(slug, callback){
     });
 };
 
+Post.remove = function(id, callback){
+    mongodb.acquire(function(err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection(post_table_name, function(err, collection) {
+            if (err) {
+                mongodb.release(db);
+                return callback(err);
+            }
+            collection.remove({
+                _id : new ObjectId(id)
+            }, function(err, p) {
+                mongodb.release(db);
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, p);// success, return post info
+            });
+        });
+    });
+};
+
 Post.findAll = function(callback){
     mongodb.acquire(function(err, db) {
         if (err) {

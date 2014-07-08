@@ -3,6 +3,8 @@ var markdown = require('markdown').markdown;
 var when = require('when');
 var User = require('../models/user');
 var Post = require('../models/post');
+var moment = require('moment');
+
 var adminCtrl = {
     index : function(req, res){
         if(req.session.user === undefined || req.session.user === null){
@@ -95,11 +97,19 @@ var adminCtrl = {
 
         var id = req.session.user._id;
         Post.getByAuthorId(id, function(err, postlist){
-            res.render('admin/posts',{
+            res.render('admin/index',{
                 title : "Content list",
                 posts : postlist,
                 author : req.session.user
             });
+        });
+
+    },
+    html : function(req, res){
+        var id = req.params.post_id;
+        console.log('----:',id);
+        Post.getById(id, function(err, post){
+            res.send(post.html);
         });
 
     },
@@ -123,6 +133,18 @@ var adminCtrl = {
             success : req.flash('success').toString(),
             error : req.flash('error').toString()
         });
+    },
+
+    delete : function(req, res){
+        var id = req.params.post_id;
+        Post.remove(id, function(err, result){
+            if(result){
+                res.send('1');
+            }else{
+                res.send('0');
+            }
+        });
+
     },
     createPost : function(req, res){
         var _iid = req.body._id;

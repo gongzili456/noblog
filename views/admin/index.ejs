@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head lang="zh-CN">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title></title>
+    <!-- 新 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- 可选的Bootstrap主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/stylesheets/index.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 70px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">NoBlog</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="content">Content</a></li>
+                <li><a href="editor">New Content</a></li>
+                <li><a href="setting">Setting</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><%=author.name%> <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a href="#">Profile</a></li>
+                        <li class="divider"></li>
+                        <li><a href="/admin/signout">Sign Out</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 rightLine fixed">
+            <ul class="list-group article-list">
+                <% posts.forEach(function (post, index) { %>
+                    <li class="list-group-item article-item">
+                        <i class="icon-file-alt icon-3x article-icon"></i>
+                        <p class="text-count">发布于：<%=: post.published_at | fromNow %></p>
+                        <a href="javascript:;" value="<%=post._id%>" class="article-name"><%= post.title %></a>
+                        <a href="/admin/editor/<%=post._id%>" class="edit-article">
+                            <i class="fa fa-pencil-square-o"></i>
+                        </a>
+                        <a href="javascript:;" value="<%=post._id%>" class="delete-article">
+                            <i class="fa fa-trash-o"></i>
+                        </a>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <div class="article-content"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="http://cdn.bootcss.com/jquery/1.11.1/jquery.min.js"></script>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+<script>
+    (function(){
+        $('.article-name').click(function (event) {
+            $(this).closest('li').siblings().removeClass('active1');
+            $(this).closest('li').addClass('active1');
+            var id = $(this).attr('value');
+            $.get('/admin/content/' + id, function (html) {
+                $('.article-content').html(html);
+            });
+
+        });
+        $('.delete-article').click(function (event) {
+            var $self = $(this);
+            var id = $(this).attr('value');
+            $.ajax({
+                url : '/admin/content/' + id,
+                dateType : 'json',
+                type : 'DELETE'
+            }).done(function (data) {
+                console.log(data);
+                if(data){
+                    $self.closest('li').remove();
+                }
+            });
+        });
+    })();
+
+</script>
+</body>
+</html>

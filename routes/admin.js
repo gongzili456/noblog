@@ -12,7 +12,8 @@ module.exports = function (app) {
     app.get('/admin/signout', admin.signout);
 
     app.get('/admin/content', admin.content);
-
+    app.get('/admin/content/:post_id', admin.html);
+    app.delete('/admin/content/:post_id', admin.delete);
 
     app.get('/admin/editor', admin.toCreate);
     app.post('/admin/editor', admin.createPost);

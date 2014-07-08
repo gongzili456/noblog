@@ -2,7 +2,7 @@ var crypto = require('crypto');
 var Post = require('../models/post');
 var User = require('../models/user');
 var ObjectId = require('mongodb').ObjectID;
-
+var moment = require('moment');
 //format user array to json, key is user _id
 function handle(p, u){
     function parseUsers(users){
@@ -46,6 +46,17 @@ var frontendCrtl = {
 
         console.log('ps:', ps);
 
+        if(ps[0] === ''){
+            console.log('null---')
+            res.send();
+            return;
+        }
+        if(ps[1] === 'stylesheets' || ps[1] ===  'javascripts' || ps[1] ===  'images'){
+            console.log('static---')
+            res.send();
+            return;
+        }
+
         var link = ps[1];
 
         Post.getBySlug(link, function(err, post){
@@ -86,15 +97,8 @@ var frontendCrtl = {
                 var session_user = req.session.user;
                 res.render('index', {
                     title : 'index',
-                    posts : ps,
-                    user : {
-                        name : session_user.name,
-                        email : session_user.email,
-                        bio : session_user.bio,
-                        website : session_user.website,
-                        image : session_user.image,
-                        cover : session_user.cover
-                    }
+                    moment : moment,
+                    posts : ps
                 });
             });
         });

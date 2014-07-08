@@ -8,8 +8,15 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
-
+var moment = require('moment');
 var router = require('./routes');
+
+var ejs = require('ejs');
+ejs.filters.fromNow = function(date){
+    moment.lang('zh-cn');
+    return moment(date).fromNow();
+}
+
 
 var app = express();
 
